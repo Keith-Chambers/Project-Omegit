@@ -31,7 +31,7 @@ ApplicationWindow {
             State
             {
                 name: "loggedIn"
-                PropertyChanges{ target: dummyMainPage; visible: true; }
+                //PropertyChanges{ target: dummyMainPage; visible: true; }
                 PropertyChanges{ target: bar; visible: false; }
                 when: BackEnd.loggedIn === true
             }
@@ -64,9 +64,4 @@ ApplicationWindow {
         visible: false
     }
 
-    DummyMainPage
-    {
-        id: dummyMainPage
-        visible: false
-    }
 }
