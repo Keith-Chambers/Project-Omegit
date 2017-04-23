@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
 	GuiControlLayer guiControlLayer(Util::readJson(QString("C:/libs/client_info.json")), &app);
 
     engine.rootContext()->setContextProperty("BackEnd", &guiControlLayer);
+    engine.rootContext()->setContextProperty("Model", guiControlLayer.getMessageThread());
 	
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
 
