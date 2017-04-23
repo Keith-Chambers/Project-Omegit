@@ -4,8 +4,15 @@ import QtQuick.Layouts 1.0
 
 ApplicationWindow {
     visible: true
-    width: 350
-    height: 400
+    width: BackEnd.appWidth
+    height: BackEnd.appHeight
+    /*
+    minimumHeight: BackEnd.appHeight
+    minimumWidth: BackEnd.appWidth
+    maximumHeight: BackEnd.appHeight
+    maximumWidth: BackEnd.appWidth
+    */
+
     title: qsTr("DiTalk")
 
     StateGroup
@@ -31,10 +38,19 @@ ApplicationWindow {
             State
             {
                 name: "loggedIn"
-                //PropertyChanges{ target: dummyMainPage; visible: true; }
+                PropertyChanges{ target: startChatPage; visible: true; }
                 PropertyChanges{ target: bar; visible: false; }
                 when: BackEnd.loggedIn === true
+            },
+
+            State
+            {
+                name: "chatting"
+                PropertyChanges {target: messageThread; visible: true; }
+                PropertyChanges{ target: bar; visible: false; }
+                when: BackEnd.chatting === true
             }
+
         ]
     }
 
@@ -64,4 +80,15 @@ ApplicationWindow {
         visible: false
     }
 
+    StartChatPage
+    {
+        id: startChatPage
+        visible: false
+    }
+
+    MessageThread
+    {
+        id: messageThread
+        visible: false
+    }
 }
