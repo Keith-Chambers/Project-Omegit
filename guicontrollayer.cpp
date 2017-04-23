@@ -3,7 +3,7 @@
 GuiControlLayer::GuiControlLayer(QJsonDocument pClientInfo, QObject *parent)
     : QObject(parent), mClientInfo(pClientInfo)
 {
-
+    QObject::connect(this, SIGNAL(loggedInChanged(bool)), this, SLOT(changeApplicationDimensions(bool)));
 }
 
 bool GuiControlLayer::registerUser(QString pUsername, QString pPassword,
@@ -30,6 +30,22 @@ bool GuiControlLayer::registerUser(QString pUsername, QString pPassword,
     return registration.attemptRegistration();
 }
 
+void GuiControlLayer::changeApplicationDimensions(bool pIsLoggedIn)
+{
+    if(pIsLoggedIn)
+    {
+        mFrontEndState.applicationHeight = 580;
+        mFrontEndState.applicationWidth = 640;
+    }else
+    {
+        mFrontEndState.applicationHeight = 400;
+        mFrontEndState.applicationWidth = 350;
+    }
+
+    emit appHeightChanged();
+    emit appWidthChanged();
+}
+
 bool GuiControlLayer::loginUser(QString pUsername, QString pPassword)
 {
     mUserSession.login(pUsername, pPassword);
@@ -50,4 +66,24 @@ void GuiControlLayer::relayLoggedIn(bool pIsLoggedIn)
     qDebug() << "Emitting logginChanged";
     emit loggedInChanged(pIsLoggedIn);
     qDebug() << "Logged in: " << isLoggedIn();
+}
+
+int GuiControlLayer::getAppWidth()
+{
+    return mFrontEndState.applicationWidth;
+}
+
+int GuiControlLayer::getAppHeight()
+{
+    return mFrontEndState.applicationHeight;
+}
+
+MessageThread *GuiControlLayer::getMessageThread()
+{
+    return mUserSession.getMessageThread();
+}
+
+void GuiControlLayer::startChat()
+{
+    mUserSession.startChat();
 }
