@@ -1,10 +1,18 @@
 #include "usersession.h"
 
-UserSession::UserSession(QObject *parent)
-    : mNetConnection(), mNetworkState(NetworkState::NoConnection), QObject(parent)
+UserSession::UserSession(QObject *parent) :
+    QObject(parent), mNetConnection(), mNetworkState(NetworkState::NoConnection),
+    mChatDetails(), mMessageThread(), mChatPollTimer()
 {
     QObject::connect(&mNetConnection, SIGNAL(finished(QNetworkReply*)),
                      this, SLOT(handleNetworkResponse(QNetworkReply*)));
+
+    QObject::connect(&mChatPollTimer, SIGNAL(timeout()), this, SLOT(updateMessageThread()));
+
+    mChatPollTimer.setInterval(500);
+    mChatPollTimer.setSingleShot(true);
+
+    resetUserRecord();
 }
 
 bool UserSession::login(QString pUsername, QString pPassword)
@@ -83,6 +91,8 @@ void UserSession::resetUserRecord()
 
 void UserSession::handleNetworkResponse(QNetworkReply* reply)
 {
+    //qDebug() << reply->readAll();
+
     switch(mNetworkState)
     {
     case NetworkState::Login:
@@ -91,20 +101,24 @@ void UserSession::handleNetworkResponse(QNetworkReply* reply)
     case NetworkState::Logout:
         logoutResponse(reply);
         break;
+    case NetworkState::InitChat:
+        startChatResponse(networkReplayToJsonObject(reply));
+        break;
+    case NetworkState::Connected:
+        updateMessageThreadResponse(networkReplayToJsonArray(reply));
+        break;
     default:
         qDebug() << "Invalid connection response received";
     }
 
-    mNetworkState = NetworkState::NoConnection;
+    //mNetworkState = NetworkState::NoConnection;
 }
 
 void UserSession::loginResponse(QNetworkReply* reply)
 {
-    //qDebug() << reply->readAll();
-
     QString rawJsonResponse {reply->readAll()};
 
-    qDebug() << rawJsonResponse;
+    //qDebug() << "Raw Json: " + rawJsonResponse;
 
     QJsonDocument json;
     json = QJsonDocument::fromJson(rawJsonResponse.toUtf8());
@@ -151,3 +165,187 @@ bool UserSession::isLoggedIn()
 {
     return mUserRecord.loggedIn;
 }
+
+void UserSession::startChatResponse(QJsonObject &pJsonObject)
+{
+    qDebug() << "Response to starting chat received";
+
+    if(pJsonObject["chatId"].toString().isEmpty())
+    {
+        qDebug() << "Failed to obtain chat id";
+        qDebug() << pJsonObject["errorMessage"].toString();
+        return;
+    }
+
+    mChatDetails.setChatId(pJsonObject["chatId"].toString());
+    mChatDetails.setPartnerId(pJsonObject["partnerId"].toString());
+    mChatDetails.partnerUsername = pJsonObject["partnerUsername"].toString();
+
+    qDebug() << "Chat started with id :" << mChatDetails.chatId;
+
+    if(mChatDetails.chatId == NULL)
+    {
+        qDebug() << "ChatId is NULL";
+        return;
+    }else
+    {
+        qDebug() << "Chat Id is not null";
+    }
+
+    mNetworkState = NetworkState::Connected;
+
+    qDebug() << "Updating message thread";
+    updateMessageThread();
+
+}
+
+void UserSession::updateMessageThread(QString pMessage)
+{
+    mChatPollTimer.stop();
+
+    QByteArray postData;
+    QString param1 {"chatId=" + QString(mChatDetails.chatId) + "&"};
+    QString param2 {"lastMessageId=" + QString(mMessageThread.getLastMessageId()) + "&"};
+    QString param3 {"newMessage=" + pMessage };
+
+    postData.append(param1.toLocal8Bit());
+    postData.append(param2.toLocal8Bit());
+    postData.append(param3.toLocal8Bit());
+
+    QNetworkRequest request(QUrl(config::apiUrl.toString() + config::endPoints["chat"]));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+
+    mNetConnection.post(request, postData);
+
+    mNetworkState = NetworkState::Connected;
+
+    qDebug() << "Request to update chat sent";
+}
+
+void UserSession::updateMessageThread()
+{
+    QByteArray postData;
+    QString param1 {"chatId=" + QString(mChatDetails.chatId) + "&"};
+    QString param2 {"lastMessageId=" + QString(mMessageThread.getLastMessageId()) };
+
+    postData.append(param1.toLocal8Bit());
+    postData.append(param2.toLocal8Bit());
+
+    QNetworkRequest request(QUrl(config::apiUrl.toString() + config::endPoints["chat"]));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+
+    mNetConnection.post(request, postData);
+    mNetworkState = NetworkState::Connected;
+
+    qDebug() << "Request to update chat sent";
+}
+
+void UserSession::updateMessageThreadResponse(QJsonArray pJsonArray)
+{
+    for(int i = 0; i < pJsonArray.size(); i++)
+    {
+        QJsonObject jsonObject = pJsonArray.at(i).toObject();
+        qDebug() << jsonObject["senderId"].toString() + ": " + jsonObject["content"].toString();
+
+        QString content = jsonObject["content"].toString();
+        int senderId = jsonObject["senderId"].toInt();
+        QString senderUsername;
+        QColor color;
+        int messageId = jsonObject["id"].toInt();
+
+        if(senderId == mChatDetails.partnerId)
+        {
+            color = QColor(200, 100, 50);
+            senderUsername = mChatDetails.partnerUsername;
+        }
+        else
+        {
+            senderUsername = "You";
+            color = QColor(50, 100, 200);
+        }
+
+        Message newMessage(content, senderUsername, color, messageId);
+        qDebug() << "Added message with ID: " << QString(messageId);
+
+        if(messageId == NULL)
+        {
+            qDebug() << "Message ID is null";
+            return;
+        }else
+        {
+            qDebug() << "Not null!";
+        }
+        mMessageThread.addItem(newMessage);
+    }
+
+    mChatPollTimer.stop();
+    mChatPollTimer.start();
+
+    qDebug() << "Chat Poll Timer set for " + QString(mChatPollTimer.remainingTime());
+
+    return;
+}
+
+void UserSession::startChat()
+{
+    QByteArray postData;
+
+    QNetworkRequest request(QUrl(config::apiUrl.toString() + config::endPoints["usersConnect"]));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+
+    mNetConnection.post(request, postData);
+    mNetworkState = NetworkState::InitChat;
+
+    qDebug() << "Request to start chat sent";
+}
+
+MessageThread *UserSession::getMessageThread()
+{
+    return &mMessageThread;
+}
+
+QJsonObject UserSession::networkReplayToJsonObject(QNetworkReply* reply)
+{
+    QString output {reply->readAll()};
+    qDebug() << output;
+    QJsonDocument json;
+    json = QJsonDocument::fromJson(output.toUtf8());
+
+    if(json.isNull() || !json.isObject())
+    {
+        qDebug() << "Failed to create json object";
+        return QJsonObject();
+    }
+
+    return json.object();
+}
+
+QJsonArray UserSession::networkReplayToJsonArray(QNetworkReply* reply)
+{
+    QString output {reply->readAll()};
+    qDebug() << output;
+    QJsonDocument json;
+    json = QJsonDocument::fromJson(output.toUtf8());
+
+    if(json.isNull() || !json.isArray())
+    {
+        qDebug() << "Failed to create json array";
+        return QJsonArray();
+    }
+
+    return json.array();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
