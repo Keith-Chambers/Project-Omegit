@@ -1,16 +1,6 @@
 <?php
 	require('dbConnect.php');
 	
-	/*
-		What do I need to do?
-		
-		Get the code, username and password
-		Use the code to get an access token and idtoken
-		Find out the rest of the information from the google api
-		Create the users account
-		Inform the user they may log in
-	*/
-	
 	function extractSection($parseString, $seperator, $section)
 	{
 		
@@ -145,7 +135,7 @@
 		$jsonUserData = json_decode($result, true);
 		$ageData = $jsonUserData['ageRange'];
 		
-		$age = (((int)$ageData['max'] - (int)$ageData['min']) == 2) ? ((int)$ageData['max'] )- 1 : "Unknown";
+		$age = (((int)$ageData['max'] - (int)$ageData['min']) == 2) ? ((int)$ageData['max'] )- 1 : "-1";
 		$nameData = $jsonUserData['name'];
 		$fName = $nameData['givenName'];
 		$lName = $nameData['familyName'];
