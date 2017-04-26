@@ -26,7 +26,7 @@ Item {
                 width: parent.width;
                 height: parent.height
                 interactive: false
-                spacing: 0
+                spacing: 1
                 clip: true
 
                 model: MessageThreadModel
