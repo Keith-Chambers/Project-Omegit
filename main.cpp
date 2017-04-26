@@ -1,6 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QQuickStyle>
 
 //#include "guicontrollayer.h"
 #include "ditalkbackendcontroller.h"
@@ -14,10 +15,8 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
+    QQuickStyle::setStyle("Material");
 	
-    //GuiControlLayer guiControlLayer(Util::readJson(QString("C:/libs/client_info.json")), &app);
-    //engine.rootContext()->setContextProperty("BackEnd", &guiControlLayer);
-    //engine.rootContext()->setContextProperty("Model", guiControlLayer.getMessageThread());
     DitalkBackendController backend(&engine);
     DitalkGuiLayer guiLayer(backend);
     DitalkState::declareQML();
