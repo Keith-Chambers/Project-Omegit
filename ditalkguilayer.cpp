@@ -9,6 +9,29 @@ DitalkGuiLayer::DitalkGuiLayer(DitalkBackendController &pBackend, QObject *paren
     QObject::connect(&mBackend, SIGNAL(stateChanged(DitalkState::State)),
                      this, SLOT(onStateChanged(DitalkState::State)));
 
+    QObject::connect(&mBackend, SIGNAL(usernameChanged()),
+                     this, SIGNAL(usernameChanged()));
+    QObject::connect(&mBackend, SIGNAL(firstNameChanged()),
+                     this, SIGNAL(firstNameChanged()));
+    QObject::connect(&mBackend, SIGNAL(lastNameChanged()),
+                     this, SIGNAL(lastNameChanged()));
+    QObject::connect(&mBackend, SIGNAL(fullNameChanged()),
+                     this, SIGNAL(fullNameChanged()));
+
+    QObject::connect(&mBackend, SIGNAL(startChatFailed()), this, SLOT(onStartChatFailed()));
+}
+
+void DitalkGuiLayer::onStartChatFailed()
+{
+    qDebug() << "onStartChatFailed called";
+    mWaiting = false;
+    emit waitingChanged(mWaiting);
+}
+
+bool DitalkGuiLayer::getWaiting()
+{
+    qDebug() << "Get waiting";
+    return mWaiting;
 }
 
 void DitalkGuiLayer::onStateChanged(DitalkState::State pNewState)
@@ -21,8 +44,8 @@ void DitalkGuiLayer::onStateChanged(DitalkState::State pNewState)
         break;
     case DitalkState::State::LoggedIn:
     case DitalkState::State::Chatting:
-        mFrontEndState.applicationHeight = 580;
-        mFrontEndState.applicationWidth = 640;
+        mFrontEndState.applicationHeight = 520;
+        mFrontEndState.applicationWidth = 500;
         break;
     default:
         qDebug() << "Warning: Invalid State passed to DitalkGuiLayer::onStateChanged()";
@@ -57,6 +80,8 @@ void DitalkGuiLayer::registerUser(QString pUsername, QString pPassword,
 void DitalkGuiLayer::startChat()
 {
     mBackend.newChat();
+    mWaiting = true;
+    emit waitingChanged(mWaiting);
 }
 
 void DitalkGuiLayer::login(QString pUsername, QString pPassword)
@@ -84,9 +109,32 @@ void DitalkGuiLayer::sendMessage(QString pMessage)
     mBackend.sendMessage(pMessage);
 }
 
+QString DitalkGuiLayer::getUsername()
+{
+    return mBackend.getUsername();
+}
 
+QString DitalkGuiLayer::getFirstName()
+{
+    return mBackend.getFirstName();
+}
 
+QString DitalkGuiLayer::getLastName()
+{
+    return mBackend.getLastName();
+}
 
+QString DitalkGuiLayer::getFullName()
+{
+    qDebug() << "Full name: " + mBackend.getFullName();
+    return mBackend.getFullName();
+}
+
+void DitalkGuiLayer::logout()
+{
+    qDebug() << "Logging out";
+    mBackend.logout();
+}
 
 
 
