@@ -55,4 +55,4 @@ The web api is written in PHP and MySQL, it is structured as follows:
 
 ## ScreenShots ##
 
-![Alt text](/Screenshots/login_empty?raw=true "Login Page")
+![Alt text](/Screenshots/login_empty.png?raw=true "Login Page")
