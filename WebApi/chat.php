@@ -52,17 +52,40 @@
     {
         $lastMessageId = $_POST['lastMessageId'];
     }
-    
+	
+	// Add new message
+	if(isset($_POST['newMessage']))
+	{
+		$message = $_POST['newMessage'];
+			
+		$query = "INSERT INTO message (chatId, senderId, content) VALUES ($chatId, $userId, '$message')";
+		$result = $conn->query($query);
+		if($result === false)
+		{
+			$errMessage['errorMessage'] = "Error, failed to update db with new message (chatId, userId, message) Valued ($chatId, $userId, $message)";
+			echo json_encode($errMessage);
+			exit();
+		}
+    }
+	
     $query = "SELECT senderId, content, id FROM message WHERE chatId=$chatId AND id>$lastMessageId";
     $result = $conn->query($query);
-    if($result === false || mysqli_num_rows($result) == 0)
+    if($result === false)
     {
-        $errMessage['errorMessage'] = 'No chats found';
+        $errMessage['errorMessage'] = 'Failed to select message data';
         echo json_encode($errMessage);
         exit();
     }
+	
+	$messages;
+	
+	if(mysqli_num_rows($result) == 0)
+	{
+		//json_encode($messages);
+		echo "No new messages";
+		exit();
+	}
     
-    $messages;
     $i = 0;
     
     while( ($row = mysqli_fetch_assoc($result) ) != false)
@@ -78,20 +101,7 @@
     }
     
     echo json_encode($messages);
-    
-    if(!isset($_POST['newMessage']))
-        exit();
-        
-    $message = $_POST['newMessage'];
-        
-    $query = "INSERT INTO message (chatId, senderId, content) VALUES ($chatId, $userId, $message)";
-    $result = $conn->query($query);
-    if($result === false)
-    {
-        $errMessage['errorMessage'] = 'Error, failed to update db with new message';
-        echo json_encode($errMessage);
-        exit();
-    }
+	echo "    \n end";
  ?>
  
  
