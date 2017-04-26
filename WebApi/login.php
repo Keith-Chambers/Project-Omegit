@@ -42,6 +42,9 @@
 	$_SESSION['userID'] = $userData['id'];
 	
 	$sessionData['sessionID'] = session_id();
+	$sessionData['username'] = $username;
+	$sessionData['firstName'] = $userData['firstname'];
+	$sessionData['lastName'] = $userData['lastname'];
 	
 	echo json_encode($sessionData);
 ?>
