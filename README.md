@@ -58,5 +58,5 @@ The web api is written in PHP and MySQL, it is structured as follows:
 ![Alt text](/Screenshots/login_empty.png?raw=true "Login Page")
 ![Alt text](/Screenshots/register_empty.png?raw=true "Register Page")
 ![Alt text](/Screenshots/start_chat.png?raw=true "Start Chat Page")
-![Alt text](/Screenshots/start_chat_waiting.png.png?raw=true "Start Chat Waiting")
+![Alt text](/Screenshots/start_chat_waiting.png?raw=true "Start Chat Waiting")
 ![Alt text](/Screenshots/active_chat_old.png?raw=true "Active Chat")
