@@ -60,3 +60,7 @@ The web api is written in PHP and MySQL, it is structured as follows:
 ![Alt text](/Screenshots/start_chat.png?raw=true "Start Chat Page")
 ![Alt text](/Screenshots/start_chat_waiting.png?raw=true "Start Chat Waiting")
 ![Alt text](/Screenshots/active_chat_old.png?raw=true "Active Chat")
+
+## Youtube ##
+
+[![OOP Assignment 3](https://img.youtube.com/vi/Q0LjEigryfQ/0.jpg)](https://www.youtube.com/watch?v=Q0LjEigryfQ)
