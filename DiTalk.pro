@@ -1,4 +1,4 @@
-QT += qml quick
+QT += qml quick quickcontrols2
 
 CONFIG += c++11
 
@@ -7,7 +7,11 @@ SOURCES += main.cpp \
     ditalkregistration.cpp \
     guicontrollayer.cpp \
     usersession.cpp \
-    util.cpp
+    util.cpp \
+    messagethread.cpp \
+    ditalkbackendcontroller.cpp \
+    chatmanager.cpp \
+    ditalkguilayer.cpp
 
 RESOURCES += qml.qrc
 
@@ -22,6 +26,8 @@ QML_DESIGNER_IMPORT_PATH =
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
+
+QT_QUICK_CONTROLS_STYLE=material ./app
 
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -38,4 +44,9 @@ HEADERS += \
     ditalkregistration.h \
     guicontrollayer.h \
     usersession.h \
-    util.h
+    util.h \
+    messagethread.h \
+    ditalkbackendcontroller.h \
+    chatmanager.h \
+    ditalkguilayer.h \
+    ditalkstate.h
