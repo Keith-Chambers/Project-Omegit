@@ -163,7 +163,8 @@
 			$query = "DELETE FROM openChatRequests WHERE id1=$userId";
 			if($conn->query($query) === false)
 			{
-				echo "Warning: Failed to delete chat connection request from database</br>";
+				$errMessage['errorMessage'] = 'Warning: Failed to delete chat connection request from database';
+                echo json_encode($errMessage);
 			}
 			exit();
             
@@ -171,6 +172,13 @@
 
         $errMessage['errorMessage'] = 'Request to find chat partner timed out';
         echo json_encode($errMessage);
+		
+		$query = "DELETE FROM openChatRequests WHERE id1=$userId";
+			if($conn->query($query) === false)
+			{
+				$errMessage['errorMessage'] = 'Warning: Failed to delete chat connection request from database';
+                echo json_encode($errMessage);
+			}
     }
     
     require('dbConnect.php');
