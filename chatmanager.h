@@ -67,8 +67,8 @@ signals:
     /*  Emitted when chat connection is disconnected
      */
     void chatDisconnected();
+    void startChatTimeOut();
 public slots:
-    void startChatResponse(QNetworkReply *pReply);
     /*
      * Sends the user's message to the server
      * The server will process the message and return all new message information,
@@ -79,7 +79,7 @@ public slots:
     /*
      * Handles the servers response to request sent by startChat)
      */
-
+    void startChatResponse(QNetworkReply *pReply);
     /*
      * Gets new message data from the server and updates MessageThread model
      */

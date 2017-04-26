@@ -75,12 +75,12 @@ void ChatManager::updateMessageThreadResponse(QNetworkReply * pReply)
 
         if(senderId == mChatDetails.partnerId)
         {
-            color = QColor(200, 100, 50);
+            color = QColor(0,188,212);
             senderUsername = mChatDetails.partnerUsername;
         } else
         {
             senderUsername = "You";
-            color = QColor(50, 100, 200);
+            color = QColor(96,125,139);
         }
 
         Message newMessage(content, senderUsername, color, messageId);
@@ -139,6 +139,7 @@ void ChatManager::startChatResponse(QNetworkReply *pReply)
     {
         qDebug() << "Failed to obtain chat id";
         qDebug() << jsonObject["errorMessage"].toString();
+        emit startChatTimeOut();
         return;
     }
 
