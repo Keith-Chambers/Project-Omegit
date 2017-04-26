@@ -1,17 +1,21 @@
 import QtQuick 2.7
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.0
+import DitalkEnums 1.0
 
 ApplicationWindow {
     visible: true
     width: BackEnd.appWidth
     height: BackEnd.appHeight
-    /*
-    minimumHeight: BackEnd.appHeight
-    minimumWidth: BackEnd.appWidth
-    maximumHeight: BackEnd.appHeight
-    maximumWidth: BackEnd.appWidth
-    */
+
+    /* minimumHeight: height
+    minimumWidth: width
+    maximumHeight: height
+    maximumWidth: width */
+
+    property int loggedIn: AppState.LoggedIn
+    property int loggedOut: AppState.LoggedOut
+    property int chatting: AppState.Chatting
 
     title: qsTr("DiTalk")
 
@@ -25,14 +29,14 @@ ApplicationWindow {
             {
                 name: "login"
                 PropertyChanges{ target: loginPage; visible: true; }
-                when: bar.currentIndex === 0 && !BackEnd.loggedIn
+                when: bar.currentIndex === 0 && BackEnd.state === AppState.LoggedOut
             },
 
             State
             {
                 name: "register"
                 PropertyChanges{ target: registerPage; visible: true; }
-                when: bar.currentIndex === 1 && !BackEnd.loggedIn
+                when: bar.currentIndex === 1 && BackEnd.state === AppState.LoggedOut
             },
 
             State
@@ -40,15 +44,16 @@ ApplicationWindow {
                 name: "loggedIn"
                 PropertyChanges{ target: startChatPage; visible: true; }
                 PropertyChanges{ target: bar; visible: false; }
-                when: BackEnd.loggedIn === true
+                when: BackEnd.state === AppState.LoggedIn
             },
 
             State
             {
                 name: "chatting"
                 PropertyChanges {target: messageThread; visible: true; }
+                PropertyChanges {target: messageInputControl; visible: true}
                 PropertyChanges{ target: bar; visible: false; }
-                when: BackEnd.chatting === true
+                when: BackEnd.state === AppState.Chatting
             }
 
         ]
@@ -90,5 +95,16 @@ ApplicationWindow {
     {
         id: messageThread
         visible: false
+    }
+
+    MessageInputControl
+    {
+        id: messageInputControl
+        visible: false
+        anchors
+        {
+            top: messageThread.bottom
+            left: messageThread.left
+        }
     }
 }
