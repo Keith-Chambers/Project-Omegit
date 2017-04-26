@@ -12,6 +12,19 @@ Qt::ItemFlags MessageThread::flags(const QModelIndex &index) const
 
 void MessageThread::addItem(const Message &pMessage)
 {
+    /* If pMessage sender is the same as the last message sent,
+     * just append the message contents of pMessage to the last message
+     */
+    if(mMessageList.size() > 0 && mMessageList.back().senderUsername == pMessage.senderUsername)
+    {
+        QString messageContent = pMessage.body;
+        messageContent.prepend(QChar('\n'));
+        mMessageList.back().body.append(messageContent);
+        mMessageList.back().messageId = pMessage.messageId;
+        dataChanged(QAbstractListModel::index(mMessageList.size() - 1), QAbstractListModel::index(mMessageList.size() - 1));
+        return;
+    }
+
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
     mMessageList.append(pMessage);
     endInsertRows();

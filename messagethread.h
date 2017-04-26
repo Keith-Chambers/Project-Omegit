@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QColor>
 #include <QDate>
+#include <QChar>
 
 typedef struct Message
 {
