@@ -9,5 +9,7 @@ namespace config
 {
     extern QUrl apiUrl;
     extern QHash<QString, QString> endPoints;
+    extern QString jsonClientInfoPath;
+    extern qint64 chatPollFreqMilliSecs;
 }
 #endif // CONFIG_H
