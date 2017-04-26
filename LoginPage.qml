@@ -33,7 +33,7 @@ Item {
 
             onClicked:
             {
-                BackEnd.loginUser(usernameInput.text, passwordInput.text);
+                BackEnd.login(usernameInput.text, passwordInput.text);
                 usernameInput.text = "";
                 passwordInput.text = "";
             }
