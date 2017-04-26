@@ -7,5 +7,10 @@
         <file>LoginPage.qml</file>
         <file>RegisterPage.qml</file>
         <file>WaitPage.qml</file>
+        <file>StartChatPage.qml</file>
+        <file>MessageElement.qml</file>
+        <file>MessageThread.qml</file>
+        <file>MessageInputControl.qml</file>
+        <file>TopBar.qml</file>
     </qresource>
 </RCC>
