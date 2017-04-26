@@ -19,6 +19,9 @@ Item {
         }
 
         height: 20
+        radius: 5
+        border.color: "black"
+        border.width: 1
         color: backgroundColor
 
         Text
