@@ -8,6 +8,7 @@ DitalkBackendController::DitalkBackendController(QQmlApplicationEngine *pEngine,
 
     QObject::connect(&mChatManager, SIGNAL(newChatEstablished()), this, SLOT(onNewChat()));
     QObject::connect(&mChatManager, SIGNAL(chatDisconnected()), this, SLOT(onChatDisconnected()));
+    QObject::connect(&mChatManager, SIGNAL(startChatTimeOut()), this, SIGNAL(startChatFailed()));
 }
 
 void DitalkBackendController::registerAccount(RegistrationDetails pRegistrationDetails)
@@ -168,6 +169,9 @@ void DitalkBackendController::loginResponse(QNetworkReply* reply)
         return;
     }
 
+    mUserRecord.username = jsonObject["username"].toString();
+    mUserRecord.firstName = jsonObject["firstName"].toString();
+    mUserRecord.lastName = jsonObject["lastName"].toString();
     mUserRecord.sessionID = jsonObject["sessionID"].toString();
 
     QString cookieName {"PHPSESSID"};
@@ -179,13 +183,77 @@ void DitalkBackendController::loginResponse(QNetworkReply* reply)
     mState = DitalkState::State::LoggedIn;
     emit stateChanged(mState);
 
+    emit usernameChanged();
+    emit firstNameChanged();
+    emit lastNameChanged();
+    emit fullNameChanged();
+
     qDebug() << "Login response received";
 }
 
 void DitalkBackendController::logoutResponse(QNetworkReply* reply)
 {
     qDebug() << reply->readAll();
-    qDebug() << "Successfully logged out";
+    //qDebug() << "Successfully logged out";
     mState = DitalkState::State::LoggedOut;
     emit stateChanged(mState);
 }
+
+QString DitalkBackendController::getUsername()
+{
+    if(mState == DitalkState::State::LoggedOut)
+    {
+        qDebug() << "You need to be logged in to retrieve user information";
+        return QString();
+    }
+    return mUserRecord.username;
+}
+
+QString DitalkBackendController::getFirstName()
+{
+    if(mState == DitalkState::State::LoggedOut)
+    {
+        qDebug() << "You need to be logged in to retrieve user information";
+        return QString();
+    }
+    return mUserRecord.firstName;
+}
+
+QString DitalkBackendController::getLastName()
+{
+    if(mState == DitalkState::State::LoggedOut)
+    {
+        qDebug() << "You need to be logged in to retrieve user information";
+        return QString();
+    }
+    return mUserRecord.lastName;
+}
+
+QString DitalkBackendController::getFullName()
+{
+    if(mState == DitalkState::State::LoggedOut)
+    {
+        qDebug() << "You need to be logged in to retrieve user information";
+        return QString();
+    }
+
+    return mUserRecord.firstName + " " + mUserRecord.lastName;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

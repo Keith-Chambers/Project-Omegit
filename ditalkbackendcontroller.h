@@ -49,10 +49,19 @@ public:
     bool sendMessage(QString pMessage);
     //void stopChat();
     bool newChat();
+    QString getUsername();
+    QString getFirstName();
+    QString getLastName();
+    QString getFullName();
 
 signals:
     void newIncomingMessage(QString pMessage);
     void stateChanged(DitalkState::State pNewState);
+    void usernameChanged();
+    void firstNameChanged();
+    void lastNameChanged();
+    void fullNameChanged();
+    void startChatFailed();
 public slots:
     void onNewChat();
     void onChatDisconnected();
